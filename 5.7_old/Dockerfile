@@ -1,5 +1,8 @@
-FROM debian:buster-slim
-ADD  sources.list /etc/apt/
+#FROM debian:buster-slim
+FROM ubuntu:bionic
+
+# Add custom china source
+ADD sources.list /etc/apt/
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN groupadd -r mysql && useradd -r -g mysql mysql
 
@@ -41,8 +44,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Sys::Hostname
 # Data::Dumper
 		perl \
-# IP command package
-                iproute2 \
 # install "xz-utils" for .sql.xz docker-entrypoint-initdb.d files
 		xz-utils \
 	&& rm -rf /var/lib/apt/lists/*
@@ -58,9 +59,9 @@ RUN set -ex; \
 	apt-key list > /dev/null
 
 ENV MYSQL_MAJOR 5.7
-ENV MYSQL_VERSION 5.7.30-1debian10
+ENV MYSQL_VERSION 5.7.30-1ubuntu18.04
 
-RUN echo "deb http://repo.mysql.com/apt/debian/ buster mysql-${MYSQL_MAJOR}" > /etc/apt/sources.list.d/mysql.list
+RUN echo "deb http://repo.mysql.com/apt/ubuntu/ bionic mysql-${MYSQL_MAJOR}" > /etc/apt/sources.list.d/mysql.list
 
 # the "/var/lib/mysql" stuff here is because the mysql-server postinst doesn't have an explicit way to disable the mysql_install_db codepath besides having a database already "configured" (ie, stuff in /var/lib/mysql/mysql)
 # also, we set debconf keys to make APT a little quieter
