@@ -2,13 +2,12 @@ FROM openjdk:8-jre-slim
 #Add local mirror source
 ADD  sources.list /etc/apt/
 #set mycat version
-ARG mycat_version=1.6.7.5
-ENV TINI_VERSION v0.19.0 
-ENV MYCAT_VERSION $mycat_version 
-ENV MYCAT_HOME /opt/mycat
+ENV TINI_VERSION=v0.19.0 \
+    MYCAT_VERSION=1.6.7.5 \
+    MYCAT_HOME=/opt/mycat
+ENV PATH=$MYCAT_HOME/bin:$PATH
 
-RUN export PAHT=${PATH}:${MYCAT_HOME}/bin && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get install -y wget procps && \
     wget https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini -O /tini && \
     chmod +x /tini && \
@@ -25,7 +24,8 @@ WORKDIR ${MYCAT_HOME}
 VOLUME ${MYCAT_HOME}/conf
 VOLUME ${MYCAT_HOME}/logs
 
-EXPOSE 3306
+EXPOSE 8066
+EXPOSE 9066
 
-ENTRYPOINT ["/tini"]
+ENTRYPOINT ["/tini", "--"]
 CMD ["mycat", "console"]
